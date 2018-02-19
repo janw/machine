@@ -114,43 +114,68 @@ cask_args appdir: "/Applications"
 
 tap "thoughtbot/formulae"
 tap "homebrew/services"
-tap "universal-ctags/universal-ctags"
 tap "caskroom/cask"
 
+
 # Unix
-brew "universal-ctags", args: ["HEAD"]
 brew "git"
+brew "git-lfs"
 brew "openssl"
-brew "rcm"
 brew "reattach-to-user-namespace"
-brew "the_silver_searcher"
 brew "tmux"
 brew "vim"
-brew "watchman"
+brew "pandoc"
+brew "pv"
+brew "pyenv"
 brew "zsh"
 
-# Heroku
-brew "heroku"
-brew "parity"
 
-# GitHub
-brew "hub"
+# Tools
+brew "ffmpeg", args: ["with-tools", "with-fdk-aac", "with-freetype", "with-fontconfig",
+                      "with-libass", "with-libvorbis", "with-libvpx", "with-opus", "with-x265" ]
+brew "youtube-dl"
+brew "mas"
+brew "rsync"
+brew "tldr"
+brew "wget"
+brew "htop"
 
-# Image manipulation
-brew "imagemagick"
 
-# Testing
-brew "qt@5.5" if MacOS::Xcode.installed?
+# Random applications
+cask "1password"
+cask "alfred"
+cask "appcleaner"
+cask "bartender"
+cask "coconutbattery"
+cask "dropbox"
+cask "firefox"
+cask "forklift"
+cask "google-chrome"
+cask "istat-menus"
+cask "libreoffice"
+cask "resilio-sync"
+cask "sequel-pro"
+cask "skim"
+cask "skitch"
+cask "spectacle"
+cask "spotify"
+cask "sublime-text"
+cask "telegram"
+cask "vlc"
+cask "whatsapp"
+
+
+# Apps from the App Store
+mas "DaisyDisk", id: 411643860
+mas "Trello", id: 1278508951
+mas "Twitterrific 5", id: 1289378661
+mas "WhatsApp", id: 1147396723
+
 
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
-brew "coreutils"
-brew "yarn"
-cask "gpg-suite"
-
-# Databases
-brew "postgres", restart_service: :changed
-brew "redis", restart_service: :changed
+brew "readline"
+brew "xz"
 EOF
 
 if brew list | grep --silent "qt@5.5"; then
