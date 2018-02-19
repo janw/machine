@@ -124,9 +124,6 @@ brew "openssl"
 brew "reattach-to-user-namespace"
 brew "tmux"
 brew "vim"
-brew "pandoc"
-brew "pv"
-brew "pyenv"
 brew "zsh"
 
 
@@ -134,12 +131,15 @@ brew "zsh"
 brew "ffmpeg", args: ["with-tools", "with-fdk-aac", "with-freetype", "with-fontconfig",
                       "with-libass", "with-libvorbis", "with-libvpx", "with-opus", "with-x265" ]
 brew "youtube-dl"
+brew "pandoc"
 brew "mas"
 brew "rsync"
+brew "pv"
 brew "tldr"
 brew "wget"
 brew "htop"
-
+brew "npm"
+brew "pyenv"
 
 # Random applications
 cask "1password"
@@ -231,7 +231,7 @@ bash "$HOME/.asdf/plugins/nodejs/bin/import-release-team-keyring"
 install_asdf_language "nodejs"
 
 if [ -f "$HOME/.laptop.local" ]; then
-  fancy_echo "Running your customizations from ~/.laptop.local ..."
+  fancy_echo "Running your customizations from ~/.machine.local ..."
   # shellcheck disable=SC1090
-  . "$HOME/.laptop.local"
+  . "$HOME/.machine.local"
 fi
