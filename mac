@@ -45,6 +45,7 @@ fi
 
 # shellcheck disable=SC2016
 append_to_zshrc 'export PATH="$HOME/.bin:$PATH"'
+append_to_zshrc 'bundleid () { osascript -e "id of app \"$1\"" }'
 
 HOMEBREW_PREFIX="/usr/local"
 
