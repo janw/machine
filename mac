@@ -232,6 +232,11 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
+# Enable three-finger drag (now accessibility feature)
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
+defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
+
+
 
 fancy_echo "Customizing macOS screen capture settings..."
 mkdir -p "${HOME}/Pictures/Screenshots"
