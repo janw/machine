@@ -159,31 +159,32 @@ cask "appcleaner"
 cask "bartender"
 cask "coconutbattery"
 cask "db-browser-for-sqlite"
-cask "dropbox"
+cask "fantastical"
 cask "firefox"
 cask "forklift"
 cask "google-chrome"
 cask "istat-menus"
 cask "libreoffice"
-cask "macvim"
 cask "resilio-sync"
 cask "sequel-pro"
 cask "skim"
 cask "skitch"
 cask "spectacle"
 cask "spotify"
-cask "sublime-text"
+cask "sublime-text-dev"
+cask "superduper"
 cask "telegram"
+cask "tripmode"
 cask "vlc"
-cask "whatsapp"
 
 
 # Apps from the App Store
 mas "DaisyDisk", id: 411643860
+mas "Magnet", id: 441258766
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
+mas "Slack", id: 803453959
 mas "Things 3", id: 904280696
-mas "Trello", id: 1278508951
 mas "Twitterrific 5", id: 1289378661
 mas "WhatsApp", id: 1147396723
 
