@@ -41,6 +41,7 @@ fi
 
 if [ ! -f "$HOME/.zshrc" ]; then
   touch "$HOME/.zshrc"
+  touch "$HOME/.zshrc.local"
 fi
 
 # shellcheck disable=SC2016
