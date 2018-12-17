@@ -216,6 +216,7 @@ defaults write -g QLPanelAnimationDuration -float 0
 defaults write com.apple.finder DisableAllAnimations -bool true
 defaults write com.apple.dock launchanim -bool false
 defaults write com.apple.dock expose-animation-duration -float 0.1
+defaults write com.apple.universalaccess reduceMotion -bool true
 
 
 # Disable the crash reporter
@@ -247,14 +248,16 @@ defaults write com.apple.screencapture type -string "png"
 defaults write com.apple.screencapture disable-shadow -bool true
 defaults write NSGlobalDomain AppleFontSmoothing -int 2
 
+# Enable HiDPI display modes (requires restart)
+sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
 
 fancy_echo "Customizing macOS finder settings..."
 defaults write com.apple.finder NewWindowTarget -string "PfDe"
 defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop"
-defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool false
-defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
-defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool false
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 defaults write com.apple.finder ShowStatusBar -bool true
 defaults write com.apple.finder ShowPathbar -bool true
@@ -262,10 +265,16 @@ defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
 defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 defaults write NSGlobalDomain com.apple.springing.enabled -bool true
-defaults write NSGlobalDomain com.apple.springing.delay -float 0
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write NSGlobalDomain com.apple.springing.delay -float 1.0
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
+
+# Avoid creating .DS_Store files on network or USB volumes
+defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
+defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
+
+# Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
 /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
 /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
@@ -303,6 +312,9 @@ defaults write com.apple.dock autohide -bool true
 defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
 defaults write com.apple.dock showDesktopGestureEnable -int 0
 defaults write com.apple.dock showMissionControlGestureEnabled -int 0
+
+# Don’t show recent applications in Dock
+defaults write com.apple.dock show-recents -bool false
 
 # Top left screen corner → Mission Control
 defaults write com.apple.dock wvous-tl-corner -int 2
@@ -345,19 +357,12 @@ defaults write com.apple.Safari AutoFillPasswords -bool false
 defaults write com.apple.Safari AutoFillCreditCardData -bool false
 defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
 defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
-defaults write com.apple.Safari WebKitInitialTimedLayoutDelay 0.25
+defaults write com.apple.Safari WebKitInitialTimedLayoutDelay 0.1
+defaults write com.apple.Safari WebKitResourceTimedLayoutDelay 0.1
 
-
-fancy_echo "Customizing Twitterrific application settings..."
-defaults write com.iconfactory.Twitterrific5 generalAudioLevel -int 25
-defaults write com.iconfactory.Twitterrific5 generalAvatarShape -int 8
-defaults write com.iconfactory.Twitterrific5 generalFontMultiplier -float 1.1
-defaults write com.iconfactory.Twitterrific5 generalFontName -string "Amelia"
-defaults write com.iconfactory.Twitterrific5 generalPlaySounds -bool false
-defaults write com.iconfactory.Twitterrific5 generalScrollToTop =bool true
-defaults write com.iconfactory.Twitterrific5 generalTheme -int 2
-defaults write com.iconfactory.Twitterrific5 readingPositionService -int 1
-
+# Disable Preview's page scaling on printing
+defaults write com.apple.Preview PVImagePrintingScaleMode 0
+defaults write com.apple.Preview PVImagePrintingAutoRotate 0
 
 fancy_echo "Customizing Chrome application settings..."
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
@@ -370,6 +375,3 @@ defaults write com.skitch.skitch HasAskedToKeepHelperRunningInBackground -bool t
 defaults write com.skitch.skitch StartHelperAtLogin -bool false
 defaults write com.skitch.skitch KeepHelperRunningInBackground -bool false
 
-fancy_echo "Customizing TextExpander application settings..."
-defaults write com.smileonmymac.textexpander "Hide Dock Icon" -bool true
-defaults write com.smileonmymac.textexpander "Hide Main Window" -bool true
