@@ -124,6 +124,7 @@ cask_args appdir: "/Applications"
 
 tap "thoughtbot/formulae"
 tap "homebrew/services"
+tap "homebrew/cask-versions"
 tap "caskroom/cask"
 
 
