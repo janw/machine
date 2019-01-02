@@ -154,6 +154,7 @@ brew "pyenv"
 brew "duti"
 
 # Random applications
+cask "iterm2"
 cask "1password"
 cask "alfred"
 cask "appcleaner"
