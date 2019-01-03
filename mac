@@ -206,8 +206,9 @@ EOF
 
 
 fancy_echo "Installing system-wide node packages..."
-npm_install_or_update "gtop"
-
+(
+	npm_install_or_update "gtop"
+) || true
 
 fancy_echo "Customizing macOS system settings..."
 sudo -v
