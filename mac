@@ -404,3 +404,12 @@ defaults write com.flexibits.fantastical2.mac HockeySDKAutomaticallySendCrashRep
 defaults write com.flexibits.fantastical2.mac HockeySDKCrashReportActivated -bool false
 defaults write com.flexibits.fantastical2.mac SUEnableAutomaticChecks -bool true
 
+fancy_echo "Customizing Spotify client application settings..."
+defaults write com.spotify.client run_mode -string "clean_quit"
+defaults write com.spotify.client AutoStartSettingIsHidden -bool false
+
+fancy_echo "Customizing Bartender application settings..."
+defaults write com.surteesstudios.Bartender hotkey -dict-add "characters" -string "E"
+defaults write com.surteesstudios.Bartender hotkey -dict-add "keyCode" -int 14
+defaults write com.surteesstudios.Bartender hotkey -dict-add "modifierFlags" -int 1179648
+
