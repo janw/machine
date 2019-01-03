@@ -118,8 +118,9 @@ if brew list | grep -Fq brew-cask; then
 fi
 
 fancy_echo "Updating Homebrew formulae ..."
-brew update --force # https://github.com/Homebrew/brew/issues/1151
-brew bundle --file=- <<EOF
+(
+	brew update --force # https://github.com/Homebrew/brew/issues/1151
+	brew bundle --file=- <<EOF
 cask_args appdir: "/Applications"
 
 tap "thoughtbot/formulae"
@@ -178,7 +179,21 @@ cask "telegram"
 cask "tripmode"
 cask "vlc"
 
+# Programming language prerequisites and package managers
+brew "libyaml" # should come after openssl
+brew "readline"
+brew "xz"
+EOF
+) || true
 
+
+fancy_echo "Installing apps from MAS..."
+mas account > /dev/null || (
+	read -p "Please log in to the Mac App Store, and press Enter to continue."
+)
+
+(
+	brew bundle --file=- <<EOF
 # Apps from the App Store
 mas "DaisyDisk", id: 411643860
 mas "Magnet", id: 441258766
@@ -186,15 +201,8 @@ mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Slack", id: 803453959
 mas "Things 3", id: 904280696
-mas "Twitterrific 5", id: 1289378661
-mas "WhatsApp", id: 1147396723
-
-
-# Programming language prerequisites and package managers
-brew "libyaml" # should come after openssl
-brew "readline"
-brew "xz"
 EOF
+) || true
 
 
 fancy_echo "Installing system-wide node packages..."
