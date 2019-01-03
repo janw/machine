@@ -388,3 +388,19 @@ defaults write com.skitch.skitch HasAskedToKeepHelperRunningInBackground -bool t
 defaults write com.skitch.skitch StartHelperAtLogin -bool false
 defaults write com.skitch.skitch KeepHelperRunningInBackground -bool false
 
+fancy_echo "Customizing Fantastical application settings..."
+defaults write com.flexibits.fantastical2.mac DaysPerWeek -int 14
+defaults write com.flexibits.fantastical2.mac WeeksPerMonth -int 8
+defaults write com.flexibits.fantastical2.mac FirstWeekday -int 2
+defaults write com.flexibits.fantastical2.mac ListShows -int 2
+defaults write com.flexibits.fantastical2.mac HoursToShow -int 18
+defaults write com.flexibits.fantastical2.mac StatusItemBadge -string "StatusItemStyleDateAndWeekday"
+defaults write com.flexibits.fantastical2.mac ColorStatusItem -bool false
+defaults write com.flexibits.fantastical2.mac LightTheme -bool true
+defaults write com.flexibits.fantastical2.mac IgnoreQuitWarning -bool true
+defaults write com.flexibits.fantastical2.mac ShowCalendarWeeks -bool true
+defaults write com.flexibits.fantastical2.mac CombineIdenticalItems -bool true
+defaults write com.flexibits.fantastical2.mac HockeySDKAutomaticallySendCrashReports -bool false
+defaults write com.flexibits.fantastical2.mac HockeySDKCrashReportActivated -bool false
+defaults write com.flexibits.fantastical2.mac SUEnableAutomaticChecks -bool true
+
