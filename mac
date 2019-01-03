@@ -175,7 +175,7 @@ cask "skitch"
 cask "spotify"
 cask "sublime-text-dev"
 cask "superduper"
-cask "telegram"
+cask "telegram-desktop"
 cask "tripmode"
 cask "vlc"
 
