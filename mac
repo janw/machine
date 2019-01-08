@@ -183,6 +183,9 @@ cask "vlc"
 brew "libyaml" # should come after openssl
 brew "readline"
 brew "xz"
+brew "ansible"
+brew "packer"
+brew "gettext"
 EOF
 ) || true
 
