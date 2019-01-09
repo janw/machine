@@ -239,13 +239,13 @@ defaults write com.apple.dock launchanim -bool false
 defaults write com.apple.dock expose-animation-duration -float 0.1
 defaults write com.apple.universalaccess reduceMotion -bool true
 
-
 # Disable the crash reporter
 defaults write com.apple.CrashReporter DialogType -string "none"
 
 # Disable smart quotes/dashes as they’re annoying when typing code
 defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
 defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
 
 # Enable full keyboard access for all UI controls
 defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
