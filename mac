@@ -385,6 +385,10 @@ defaults write com.apple.mail DisableReplyAnimations -bool true
 defaults write com.apple.mail DisableSendAnimations -bool true
 defaults write com.apple.mail ConversationViewMarkAllAsRead -bool true
 defaults write com.apple.mail ConversationViewSortDescending -bool true
+defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
+defaults write com.apple.mail NumberOfSnippetLines -int 1
+defaults write com.apple.mail-shared DisableURLLoading -bool true
+defaults write com.apple.mail-shared ExpandPrivateAliases -bool true
 
 defaults write com.apple.Safari AutoFillFromAddressBook -bool false
 defaults write com.apple.Safari AutoFillPasswords -bool false
