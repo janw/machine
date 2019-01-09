@@ -291,6 +291,9 @@ defaults write NSGlobalDomain com.apple.springing.enabled -bool true
 defaults write NSGlobalDomain com.apple.springing.delay -float 1.0
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 defaults write com.apple.finder WarnOnEmptyTrash -bool false
+defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
+defaults write com.apple.helpviewer DevMode -bool true
 
 # Avoid creating .DS_Store files on network or USB volumes
 defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
@@ -342,6 +345,9 @@ defaults write com.apple.dock showMissionControlGestureEnabled -int 0
 # Don’t show recent applications in Dock
 defaults write com.apple.dock show-recents -bool false
 
+# Reset Launchpad
+find ~/Library/Application\ Support/Dock -name "*.db" -maxdepth 1 -delete
+
 # Top left screen corner → Mission Control
 defaults write com.apple.dock wvous-tl-corner -int 2
 defaults write com.apple.dock wvous-tl-modifier -int 0
@@ -391,6 +397,7 @@ defaults write com.apple.Safari WebKitResourceTimedLayoutDelay 0.1
 # Disable Preview's page scaling on printing
 defaults write com.apple.Preview PVImagePrintingScaleMode 0
 defaults write com.apple.Preview PVImagePrintingAutoRotate 0
+defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
 fancy_echo "Customizing Chrome application settings..."
 defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
