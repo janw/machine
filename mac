@@ -416,6 +416,7 @@ defaults write com.skitch.skitch KeepHelperRunningInBackground -bool false
 
 fancy_echo "Customizing Fantastical application settings..."
 defaults write com.flexibits.fantastical2.mac DaysPerWeek -int 14
+defaults write com.flexibits.fantastical2.mac WeekViewStartsWith -int 0
 defaults write com.flexibits.fantastical2.mac WeeksPerMonth -int 8
 defaults write com.flexibits.fantastical2.mac FirstWeekday -int 2
 defaults write com.flexibits.fantastical2.mac ListShows -int 2
