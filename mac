@@ -225,9 +225,6 @@ defaults write .GlobalPreferences com.apple.sound.beep.volume -float 0.0
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
 
-# Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
-
 # Increase window resize speed for Cocoa applications
 defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
 
@@ -237,7 +234,7 @@ defaults write -g QLPanelAnimationDuration -float 0
 defaults write com.apple.finder DisableAllAnimations -bool true
 defaults write com.apple.dock launchanim -bool false
 defaults write com.apple.dock expose-animation-duration -float 0.1
-defaults write com.apple.universalaccess reduceMotion -bool true
+sudo defaults write com.apple.universalaccess reduceMotion -bool true
 
 # Disable the crash reporter
 defaults write com.apple.CrashReporter DialogType -string "none"
@@ -388,8 +385,8 @@ defaults write com.apple.mail ConversationViewMarkAllAsRead -bool true
 defaults write com.apple.mail ConversationViewSortDescending -bool true
 defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
 defaults write com.apple.mail NumberOfSnippetLines -int 1
-defaults write com.apple.mail-shared DisableURLLoading -bool true
-defaults write com.apple.mail-shared ExpandPrivateAliases -bool true
+sudo defaults write com.apple.mail-shared DisableURLLoading -bool true
+sudo defaults write com.apple.mail-shared ExpandPrivateAliases -bool true
 
 defaults write com.apple.Safari AutoFillFromAddressBook -bool false
 defaults write com.apple.Safari AutoFillPasswords -bool false
