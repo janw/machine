@@ -376,6 +376,15 @@ defaults write com.apple.ActivityMonitor ShowCategory -int 0
 defaults write com.apple.ActivityMonitor IconType -int 5
 defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
 
+fancy_echo "Customizing iTunes application settings..."
+defaults write com.apple.itunes disableAppleMusic -bool true
+defaults write com.apple.itunes disableMusicSocial -bool true
+defaults write com.apple.itunes disableMusicStore -bool true
+defaults write com.apple.itunes disableRadio -bool true
+defaults write com.apple.itunes disableShareLibraryInfo -bool true
+defaults write com.apple.itunes disableSharedMusic -bool true
+
+fancy_echo "Customizing Mail application settings..."
 defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
 defaults write com.apple.mail SendFormat -string "Plain"
 defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
