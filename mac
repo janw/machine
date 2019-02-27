@@ -150,9 +150,23 @@ brew "pv"
 brew "tldr"
 brew "wget"
 brew "htop"
+brew "watch"
 brew "npm"
 brew "pyenv"
 brew "duti"
+
+brew "httpie"
+brew "jq"
+
+# Cloud Native
+brew "kubernetes-cli"
+brew "kubernetes-helm"
+brew "stern"
+
+
+# Docker
+cask "docker"
+brew "docker-compose"
 
 # Random applications
 cask "iterm2"
