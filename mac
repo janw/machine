@@ -127,6 +127,7 @@ tap "thoughtbot/formulae"
 tap "homebrew/services"
 tap "homebrew/cask-versions"
 tap "caskroom/cask"
+tap "homebrew/cask-fonts"
 
 
 # Unix
@@ -200,6 +201,10 @@ brew "xz"
 brew "ansible"
 brew "packer"
 brew "gettext"
+
+# Fonts
+cask "font-inconsolata-for-powerline"
+cask "font-inconsolata"
 EOF
 ) || true
 
