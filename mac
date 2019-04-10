@@ -193,6 +193,16 @@ cask "telegram-desktop"
 cask "tripmode"
 cask "vlc"
 
+# Quick Look Plugins
+cask "qlcolorcode"
+cask "qlstephen"
+cask "qlmarkdown"
+cask "quicklook-json"
+cask "webpquicklook"
+cask "suspicious-package"
+cask "quicklookase"
+cask "qlvideo"
+
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
 brew "readline"
@@ -214,7 +224,8 @@ mas account > /dev/null || (
 )
 
 (
-	brew bundle --file=- <<EOF
+brew bundle --file=- <<EOF
+
 # Apps from the App Store
 mas "DaisyDisk", id: 411643860
 mas "Magnet", id: 441258766
