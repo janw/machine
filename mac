@@ -144,12 +144,14 @@ brew "tree"
 brew "ffmpeg"
 brew "youtube-dl"
 brew "pandoc"
+brew "gnupg"
 brew "mas"
 brew "rsync"
 brew "pv"
 brew "tldr"
 brew "wget"
 brew "htop"
+brew "cjbassi/gotop/gotop"
 brew "watch"
 brew "npm"
 brew "pyenv"
@@ -171,6 +173,7 @@ brew "docker-compose"
 # Random applications
 cask "iterm2"
 cask "1password"
+cask "1password-cli"
 cask "alfred"
 cask "appcleaner"
 cask "coconutbattery"
@@ -287,6 +290,8 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+sudo defaults write bluetoothaudiod "Enable AAC codec" -bool true
+sudo defaults write bluetoothaudiod "Enable AptX codec" -bool true
 
 fancy_echo "Customizing macOS screen capture settings..."
 mkdir -p "${HOME}/Pictures/Screenshots"
