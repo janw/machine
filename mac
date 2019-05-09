@@ -138,6 +138,7 @@ brew "tmux"
 brew "vim"
 brew "zsh"
 brew "tree"
+brew "lsd"
 
 
 # Tools
