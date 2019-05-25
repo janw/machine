@@ -214,7 +214,7 @@ brew "packer"
 brew "gettext"
 
 # Fonts
-cask "font-inconsolata-for-powerline"
+cask "font-inconsolata-nerd-font"
 cask "font-inconsolata"
 EOF
 ) || true
