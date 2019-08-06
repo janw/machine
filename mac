@@ -2,95 +2,44 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+basepath="$(dirname "$0")"
 
 fancy_echo() {
   local fmt="$1"; shift
-
-  # shellcheck disable=SC2059
   printf "\n$fmt\n" "$@"
 }
 
-append_to_zshrc() {
-  local text="$1" zshrc
-  local skip_new_line="${2:-0}"
-
-  if [ -w "$HOME/.zshrc.local" ]; then
-    zshrc="$HOME/.zshrc.local"
-  else
-    zshrc="$HOME/.zshrc"
-  fi
-
-  if ! grep -Fqs "$text" "$zshrc"; then
-    if [ "$skip_new_line" -eq 1 ]; then
-      printf "%s\n" "$text" >> "$zshrc"
-    else
-      printf "\n%s\n" "$text" >> "$zshrc"
-    fi
-  fi
-}
-
-# shellcheck disable=SC2154
-trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
-
-set -e
-
-if [ ! -d "$HOME/.bin/" ]; then
-  mkdir "$HOME/.bin"
-fi
-
-if [ ! -f "$HOME/.zshrc" ]; then
-  touch "$HOME/.zshrc"
-  touch "$HOME/.zshrc.local"
-fi
-
-# shellcheck disable=SC2016
-append_to_zshrc 'export PATH="$HOME/.bin:$PATH"'
-append_to_zshrc 'bundleid () { osascript -e "id of app \"$1\"" }'
-
-HOMEBREW_PREFIX="/usr/local"
-
-if [ -d "$HOMEBREW_PREFIX" ]; then
-  if ! [ -r "$HOMEBREW_PREFIX" ]; then
-    sudo chown -R "$LOGNAME:admin" /usr/local
-  fi
-else
-  sudo mkdir "$HOMEBREW_PREFIX"
-  sudo chflags norestricted "$HOMEBREW_PREFIX"
-  sudo chown -R "$LOGNAME:admin" "$HOMEBREW_PREFIX"
-fi
-
 update_shell() {
-  local shell_path;
-  shell_path="$(which zsh)"
+  do_update() {
+    local shell_path;
+    shell_path="$(which zsh)"
 
-  fancy_echo "Changing your shell to zsh ..."
-  if ! grep "$shell_path" /etc/shells > /dev/null 2>&1 ; then
-    fancy_echo "Adding '$shell_path' to /etc/shells"
-    sudo sh -c "echo $shell_path >> /etc/shells"
-  fi
-  sudo chsh -s "$shell_path" "$USER"
-}
-
-case "$SHELL" in
-  */zsh)
-    if [ "$(which zsh)" != '/usr/local/bin/zsh' ] ; then
-      update_shell
+    fancy_echo "Changing your shell to zsh ..."
+    if ! grep "$shell_path" /etc/shells > /dev/null 2>&1 ; then
+      fancy_echo "Adding '$shell_path' to /etc/shells"
+      sudo sh -c "echo $shell_path >> /etc/shells"
     fi
-    ;;
-  *)
-    update_shell
-    ;;
-esac
+    sudo chsh -s "$shell_path" "$USER"
+  }
 
-gem_install_or_update() {
-  if gem list "$1" --installed > /dev/null; then
-    gem update "$@"
-  else
-    gem install "$@"
+  case "$SHELL" in
+    */zsh)
+      if [ "$(which zsh)" != '/usr/local/bin/zsh' ] ; then do_update; fi
+      ;;
+    *)
+      do_update
+      ;;
+  esac
+}
+
+npm_install() {
+  if ! command -v npm >/dev/null; then
+    fancy_echo "Installing Node.js and NPM via Brew ..."
+    brew install node
   fi
 }
 
-npm_install_or_update() {
+npm_update() {
   if npm list -g --depth=0 "$1" > /dev/null; then
     npm update -g "$@"
   else
@@ -98,377 +47,48 @@ npm_install_or_update() {
   fi
 }
 
-if ! command -v brew >/dev/null; then
-  fancy_echo "Installing Homebrew ..."
+brew_install() {
+  if ! command -v brew >/dev/null; then
+    fancy_echo "Installing Homebrew ..."
     curl -fsS \
       'https://raw.githubusercontent.com/Homebrew/install/master/install' | ruby
 
-    append_to_zshrc '# recommended by brew doctor'
-
-    # shellcheck disable=SC2016
-    append_to_zshrc 'export PATH="/usr/local/bin:$PATH"' 1
-
     export PATH="/usr/local/bin:$PATH"
-fi
+  fi
 
-if brew list | grep -Fq brew-cask; then
-  fancy_echo "Uninstalling old Homebrew-Cask ..."
-  brew uninstall --force brew-cask
-fi
+  if brew list | grep -Fq brew-cask; then
+    fancy_echo "Uninstalling old Homebrew-Cask ..."
+    brew uninstall --force brew-cask
+  fi
+}
 
-fancy_echo "Updating Homebrew formulae ..."
-(
-	brew update --force # https://github.com/Homebrew/brew/issues/1151
-	brew bundle --file=- <<EOF
-cask_args appdir: "/Applications"
+brew_update() {
+  fancy_echo "Updating Homebrew formulae ..."
+  brew update --force
+  brew bundle --file="${basepath}/Brewfile"
+}
 
-tap "thoughtbot/formulae"
-tap "homebrew/services"
-tap "homebrew/cask-versions"
-tap "caskroom/cask"
-tap "homebrew/cask-fonts"
+mas_install() {
+  if ! command -v mas >/dev/null; then
+    brew install mas
+  fi
+}
 
+mas_update() {
+  mas account > /dev/null || (
+    fancy_echo "Please log in to the Mac App Store, and press Enter to continue."
+    return
+  )
 
-# Unix
-brew "git"
-brew "git-lfs"
-brew "openssl"
-brew "reattach-to-user-namespace"
-brew "tmux"
-brew "vim"
-brew "zsh"
-brew "tree"
-brew "lsd"
-
-
-# Tools
-brew "ffmpeg"
-brew "youtube-dl"
-brew "pandoc"
-brew "gnupg"
-brew "mas"
-brew "rsync"
-brew "pv"
-brew "tldr"
-brew "wget"
-brew "htop"
-brew "cjbassi/gotop/gotop"
-brew "watch"
-brew "npm"
-brew "pyenv"
-brew "duti"
-
-brew "httpie"
-brew "jq"
-
-# Cloud Native
-brew "kubernetes-cli"
-brew "kubernetes-helm"
-brew "stern"
-
-
-# Docker
-cask "docker"
-brew "docker-compose"
-
-# Random applications
-cask "iterm2"
-cask "1password"
-cask "1password-cli"
-cask "alfred"
-cask "appcleaner"
-cask "coconutbattery"
-cask "db-browser-for-sqlite"
-cask "fantastical"
-cask "firefox"
-cask "forklift"
-cask "google-chrome"
-cask "istat-menus"
-cask "sequel-pro"
-cask "skim"
-cask "skitch"
-cask "spotify"
-cask "visual-studio-code"
-cask "superduper"
-cask "telegram-desktop"
-cask "tripmode"
-cask "keepingyouawake"
-cask "vlc"
-
-# Quick Look Plugins
-cask "qlcolorcode"
-cask "qlstephen"
-cask "qlmarkdown"
-cask "quicklook-json"
-cask "webpquicklook"
-cask "suspicious-package"
-cask "quicklookase"
-cask "qlvideo"
-
-# Programming language prerequisites and package managers
-brew "libyaml" # should come after openssl
-brew "readline"
-brew "xz"
-brew "ansible"
-brew "packer"
-brew "gettext"
-
-# Fonts
-cask "font-inconsolata-nerd-font"
-cask "font-inconsolata"
-EOF
-) || true
-
-
-fancy_echo "Installing apps from MAS..."
-mas account > /dev/null || (
-	read -p "Please log in to the Mac App Store, and press Enter to continue."
-)
-
-(
-brew bundle --file=- <<EOF
-
-# Apps from the App Store
-mas "DaisyDisk", id: 411643860
-mas "Magnet", id: 441258766
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "Slack", id: 803453959
-mas "Things 3", id: 904280696
-EOF
-) || true
-
+  fancy_echo "Installing apps from MAS..."
+  brew update --force
+  brew bundle --file="${basepath}/Brewfile.mas"
+}
 
 fancy_echo "Installing system-wide node packages..."
-(
-	npm_install_or_update "gtop"
-) || true
-
-fancy_echo "Customizing macOS system settings..."
-sudo -v
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
-defaults write .GlobalPreferences com.apple.sound.beep.sound /System/Library/Sounds/Tink.aiff
-defaults write .GlobalPreferences com.apple.sound.beep.volume -float 0.0
-
-# Prevent Time Machine from prompting to use new hard drives as backup volume
-defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
-
-# Increase window resize speed for Cocoa applications
-defaults write NSGlobalDomain NSWindowResizeTime -float 0.001
-
-# Disable window animations
-defaults write NSGlobalDomain NSAutomaticWindowAnimationsEnabled -bool false
-defaults write -g QLPanelAnimationDuration -float 0
-defaults write com.apple.finder DisableAllAnimations -bool true
-defaults write com.apple.dock launchanim -bool false
-defaults write com.apple.dock expose-animation-duration -float 0.1
-sudo defaults write com.apple.universalaccess reduceMotion -bool true
-
-# Disable the crash reporter
-defaults write com.apple.CrashReporter DialogType -string "none"
-
-# Disable smart quotes/dashes as they’re annoying when typing code
-defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
-defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
-defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
-
-# Enable full keyboard access for all UI controls
-defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
-
-# Disable press-and-hold for keys in favor of key repeat
-defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
-
-# Disable auto-correct
-defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
-
-# Enable three-finger drag (now accessibility feature)
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
-defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -bool true
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
-sudo defaults write bluetoothaudiod "Enable AAC codec" -bool true
-sudo defaults write bluetoothaudiod "Enable AptX codec" -bool true
-
-fancy_echo "Customizing macOS screen capture settings..."
-mkdir -p "${HOME}/Pictures/Screenshots"
-defaults write com.apple.screencapture location -string "${HOME}/Pictures/Screenshots"
-defaults write com.apple.screencapture type -string "png"
-defaults write com.apple.screencapture disable-shadow -bool true
-defaults write NSGlobalDomain AppleFontSmoothing -int 2
-
-# Enable HiDPI display modes (requires restart)
-sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
-
-fancy_echo "Customizing macOS finder settings..."
-defaults write com.apple.finder NewWindowTarget -string "PfDe"
-defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/Desktop"
-defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
-defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
-defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
-defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
-defaults write NSGlobalDomain AppleShowAllExtensions -bool true
-defaults write com.apple.finder ShowStatusBar -bool true
-defaults write com.apple.finder ShowPathbar -bool true
-defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
-defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
-defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
-defaults write NSGlobalDomain com.apple.springing.enabled -bool true
-defaults write NSGlobalDomain com.apple.springing.delay -float 1.0
-defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
-defaults write com.apple.finder WarnOnEmptyTrash -bool false
-defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
-defaults write NSGlobalDomain NSDisableAutomaticTermination -bool true
-defaults write com.apple.helpviewer DevMode -bool true
-
-# Avoid creating .DS_Store files on network or USB volumes
-defaults write com.apple.desktopservices DSDontWriteNetworkStores -bool true
-defaults write com.apple.desktopservices DSDontWriteUSBStores -bool true
-
-# Keep folders on top when sorting by name
-defaults write com.apple.finder _FXSortFoldersFirst -bool true
-
-# Wrap finder settings separately as they tend to fail on newly setup Macs
-(
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom false" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-) || true
-
-chflags nohidden ~/Library
-sudo chflags nohidden /Volumes
-
-defaults write com.apple.finder FXInfoPanesExpanded -dict \
-  General -bool true \
-  OpenWith -bool true \
-  Privileges -bool true
+npm_install_or_update "gtop"
 
 
-fancy_echo "Customizing macOS dock settings..."
-defaults write com.apple.dock tilesize -int 36
-defaults write com.apple.dock show-process-indicators -bool true
-defaults write com.apple.dashboard mcx-disabled -bool true
-defaults write com.apple.dock dashboard-in-overlay -bool true
-
-defaults write com.apple.dock autohide-delay -float 0
-defaults write com.apple.dock autohide-time-modifier -float 0
-defaults write com.apple.dock autohide -bool true
-
-defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
-defaults write com.apple.dock showDesktopGestureEnable -int 0
-defaults write com.apple.dock showMissionControlGestureEnabled -int 0
-
-# Don’t show recent applications in Dock
-defaults write com.apple.dock show-recents -bool false
-
-# Reset Launchpad
-find ~/Library/Application\ Support/Dock -name "*.db" -maxdepth 1 -delete
-
-# Top left screen corner → Mission Control
-defaults write com.apple.dock wvous-tl-corner -int 2
-defaults write com.apple.dock wvous-tl-modifier -int 0
-# Bottom left screen corner → Start screen saver
-defaults write com.apple.dock wvous-bl-corner -int 10
-defaults write com.apple.dock wvous-bl-modifier -int 0
-
-
-fancy_echo "Customizing macOS various application settings..."
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "automaticQuoteSubstitutionEnabled" -bool false
-defaults write com.apple.messageshelper.MessageController SOInputLineSettings -dict-add "continuousSpellCheckingEnabled" -bool false
-
-defaults -currentHost write com.apple.ImageCapture disableHotPlug -bool true
-
-defaults write com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
-defaults write com.apple.SoftwareUpdate ScheduleFrequency -int 5
-defaults write com.apple.SoftwareUpdate AutomaticDownload -int 1
-defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
-defaults write com.apple.SoftwareUpdate ConfigDataInstall -int 1
-defaults write com.apple.commerce AutoUpdate -bool true
-
-defaults write com.apple.TextEdit RichText -int 0
-defaults write com.apple.TextEdit PlainTextEncoding -int 4
-defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
-
-defaults write com.apple.ActivityMonitor SortColumn -string "CPUTime"
-defaults write com.apple.ActivityMonitor SortDirection -int 0
-defaults write com.apple.ActivityMonitor ShowCategory -int 0
-defaults write com.apple.ActivityMonitor IconType -int 5
-defaults write com.apple.ActivityMonitor OpenMainWindow -bool true
-
-fancy_echo "Customizing Mail application settings..."
-defaults write com.apple.mail SpellCheckingBehavior -string "NoSpellCheckingEnabled"
-defaults write com.apple.mail SendFormat -string "Plain"
-defaults write com.apple.mail AddressesIncludeNameOnPasteboard -bool false
-defaults write com.apple.mail DisableReplyAnimations -bool true
-defaults write com.apple.mail DisableSendAnimations -bool true
-defaults write com.apple.mail ConversationViewMarkAllAsRead -bool true
-defaults write com.apple.mail ConversationViewSortDescending -bool true
-defaults write com.apple.mail DisableInlineAttachmentViewing -bool true
-defaults write com.apple.mail NumberOfSnippetLines -int 1
-sudo defaults write com.apple.mail-shared DisableURLLoading -bool true
-sudo defaults write com.apple.mail-shared ExpandPrivateAliases -bool true
-
-defaults write com.apple.Safari AutoFillFromAddressBook -bool false
-defaults write com.apple.Safari AutoFillPasswords -bool false
-defaults write com.apple.Safari AutoFillCreditCardData -bool false
-defaults write com.apple.Safari AutoFillMiscellaneousForms -bool false
-defaults write com.apple.Safari FindOnPageMatchesWordStartsOnly -bool false
-defaults write com.apple.Safari WebKitInitialTimedLayoutDelay 0.1
-defaults write com.apple.Safari WebKitResourceTimedLayoutDelay 0.1
-
-# Disable Preview's page scaling on printing
-defaults write com.apple.Preview PVImagePrintingScaleMode 0
-defaults write com.apple.Preview PVImagePrintingAutoRotate 0
-defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
-
-fancy_echo "Customizing Chrome application settings..."
-defaults write com.google.Chrome AppleEnableSwipeNavigateWithScrolls -bool false
-defaults write com.google.Chrome AppleEnableMouseSwipeNavigateWithScrolls -bool false
-defaults write com.google.Chrome DisablePrintPreview -bool true
-defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
-
-fancy_echo "Customizing Skitch application settings..."
-defaults write com.skitch.skitch HasAskedToKeepHelperRunningInBackground -bool true
-defaults write com.skitch.skitch StartHelperAtLogin -bool false
-defaults write com.skitch.skitch KeepHelperRunningInBackground -bool false
-
-fancy_echo "Customizing Fantastical application settings..."
-defaults write com.flexibits.fantastical2.mac DaysPerWeek -int 14
-defaults write com.flexibits.fantastical2.mac WeekViewStartsWith -int 0
-defaults write com.flexibits.fantastical2.mac WeeksPerMonth -int 8
-defaults write com.flexibits.fantastical2.mac FirstWeekday -int 2
-defaults write com.flexibits.fantastical2.mac ListShows -int 2
-defaults write com.flexibits.fantastical2.mac HoursToShow -int 18
-defaults write com.flexibits.fantastical2.mac StatusItemBadge -string "StatusItemStyleDateAndWeekday"
-defaults write com.flexibits.fantastical2.mac ColorStatusItem -bool false
-defaults write com.flexibits.fantastical2.mac LightTheme -bool true
-defaults write com.flexibits.fantastical2.mac IgnoreQuitWarning -bool true
-defaults write com.flexibits.fantastical2.mac ShowCalendarWeeks -bool true
-defaults write com.flexibits.fantastical2.mac CombineIdenticalItems -bool true
-defaults write com.flexibits.fantastical2.mac HockeySDKAutomaticallySendCrashReports -bool false
-defaults write com.flexibits.fantastical2.mac HockeySDKCrashReportActivated -bool false
-defaults write com.flexibits.fantastical2.mac SUEnableAutomaticChecks -bool true
-
-fancy_echo "Customizing Spotify client application settings..."
-defaults write com.spotify.client run_mode -string "clean_quit"
-defaults write com.spotify.client AutoStartSettingIsHidden -bool false
-
-fancy_echo "Customizing Bartender application settings..."
-defaults write com.surteesstudios.Bartender hotkey -dict-add "characters" -string "E"
-defaults write com.surteesstudios.Bartender hotkey -dict-add "keyCode" -int 14
-defaults write com.surteesstudios.Bartender hotkey -dict-add "modifierFlags" -int 1179648
-
+defaults_write() {
+  bash "${basepath}/defaults.write.sh"
+}
