@@ -3,6 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 HERE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+NO_CONFIRM=${MACHINE_NO_CONFIRM:-}
 
 fg_red="$(tput setaf 1)"
 fg_green="$(tput setaf 2)"
@@ -17,6 +18,10 @@ fancy_echo() {
 }
 
 enter_cont() {
+  if [ -n "$NO_CONFIRM" ]; then
+    return 0
+  fi
+
   read -r -p "${bold}Continue? [Y/n] ${reset}" input
 
   case $input in

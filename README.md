@@ -28,6 +28,12 @@ Execute the downloaded script:
 sh machine 2>&1 | tee ~/machine.log
 ```
 
+Machine will ask for confirmation before continuing through the major sections of the configuration. To skip those confirmations, set `MACHINE_NO_CONFIRM=1`:
+
+```sh
+MACHINE_NO_CONFIRM=1 sh machine 2>&1 | tee ~/machine.log
+```
+
 Optionally, review the log:
 
 ```sh
