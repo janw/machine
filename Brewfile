@@ -3,7 +3,7 @@ cask_args appdir: "/Applications"
 tap "thoughtbot/formulae"
 tap "homebrew/services"
 tap "homebrew/cask-versions"
-tap "caskroom/cask"
+tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 
 
@@ -49,7 +49,6 @@ brew "docker-compose"
 
 # Random applications
 cask "iterm2"
-cask "therm"
 cask "1password"
 cask "alfred"
 cask "appcleaner"
@@ -59,15 +58,17 @@ cask "fantastical"
 cask "firefox"
 cask "google-chrome"
 cask "sequel-pro"
+cask "postico"
 cask "skim"
 cask "skitch"
 cask "spotify"
 cask "visual-studio-code"
-cask "telegram-desktop"
-cask "tripmode"
-cask "keepingyouawake"
+cask "telegram"
 cask "vlc"
-cask "gpg-suite-no-mail
+cask "gpg-suite-no-mail"
+cask "tor-browser
+cask "musicbrainz-picard"
+cask "plexamp"
 
 # Quick Look Plugins
 cask "qlcolorcode"
@@ -90,3 +91,5 @@ brew "gettext"
 # Fonts
 cask "font-inconsolata-nerd-font"
 cask "font-inconsolata"
+cask "font-ibm-plex"
+cask "font-fantasquesansmono-nerd-font"
