@@ -2,22 +2,42 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+HERE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+fg_red="$(tput setaf 1)"
+fg_green="$(tput setaf 2)"
+bold="$(tput bold)"
+reset="$(tput me)"
 
 fancy_echo() {
   local fmt="$1"; shift
 
   # shellcheck disable=SC2059
-  printf "\n$fmt\n" "$@"
+  printf "\n${fg_green}$fmt${reset}\n" "$@"
+}
+
+enter_cont() {
+  read -r -p "${bold}Continue? [Y/n] ${reset}" input
+
+  case $input in
+      [nN][oO]|[nN])
+      return 1
+      ;;
+      *)
+      return 0
+    ;;
+  esac
+
 }
 
 append_to_zshrc() {
   local text="$1" zshrc
   local skip_new_line="${2:-0}"
 
-  if [ -w "$HOME/.zshrc.local" ]; then
-    zshrc="$HOME/.zshrc.local"
+  if [ -w "$HOME/.zsh/.zshrc.local" ]; then
+    zshrc="$HOME/.zsh/.zshrc.local"
   else
-    zshrc="$HOME/.zshrc"
+    zshrc="$HOME/.zshrc.local"
   fi
 
   if ! grep -Fqs "$text" "$zshrc"; then
@@ -30,38 +50,19 @@ append_to_zshrc() {
 }
 
 # shellcheck disable=SC2154
-trap 'ret=$?; test $ret -ne 0 && printf "failed\n\n" >&2; exit $ret' EXIT
-
-set -e
+trap 'ret=$?; test $ret -ne 0 && printf "${fg_red}failed${reset}\n\n" >&2; exit $ret' EXIT
 
 if [ ! -d "$HOME/.bin/" ]; then
+  fancy_echo "Creating user .bin directory"
   mkdir "$HOME/.bin"
-fi
 
-if [ ! -f "$HOME/.zshrc" ]; then
-  touch "$HOME/.zshrc"
-  touch "$HOME/.zshrc.local"
-fi
-
-# shellcheck disable=SC2016
-append_to_zshrc 'export PATH="$HOME/.bin:$PATH"'
-append_to_zshrc 'bundleid () { osascript -e "id of app \"$1\"" }'
-
-HOMEBREW_PREFIX="/usr/local"
-
-if [ -d "$HOMEBREW_PREFIX" ]; then
-  if ! [ -r "$HOMEBREW_PREFIX" ]; then
-    sudo chown -R "$LOGNAME:admin" /usr/local
-  fi
-else
-  sudo mkdir "$HOMEBREW_PREFIX"
-  sudo chflags norestricted "$HOMEBREW_PREFIX"
-  sudo chown -R "$LOGNAME:admin" "$HOMEBREW_PREFIX"
+  # shellcheck disable=SC2016
+  append_to_zshrc 'export PATH="$HOME/.bin:$PATH"'
 fi
 
 update_shell() {
   local shell_path;
-  shell_path="$(which zsh)"
+  shell_path="$(command -v zsh)"
 
   fancy_echo "Changing your shell to zsh ..."
   if ! grep "$shell_path" /etc/shells > /dev/null 2>&1 ; then
@@ -73,7 +74,7 @@ update_shell() {
 
 case "$SHELL" in
   */zsh)
-    if [ "$(which zsh)" != '/usr/local/bin/zsh' ] ; then
+    if [ "$(command -v zsh)" != '/usr/local/bin/zsh' ] ; then
       update_shell
     fi
     ;;
@@ -98,153 +99,64 @@ npm_install_or_update() {
   fi
 }
 
-if ! command -v brew >/dev/null; then
-  fancy_echo "Installing Homebrew ..."
-    curl -fsS \
-      'https://raw.githubusercontent.com/Homebrew/install/master/install' | ruby
+brew_bootstrap() {
+  if ! command -v brew >/dev/null; then
+    fancy_echo "Installing Homebrew ..."
+    enter_cont && (
+      /bin/bash -c "$(curl -fsSL \
+        https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-    append_to_zshrc '# recommended by brew doctor'
+      append_to_zshrc '# recommended by brew doctor'
 
-    # shellcheck disable=SC2016
-    append_to_zshrc 'export PATH="/usr/local/bin:$PATH"' 1
+      # shellcheck disable=SC2016
+      append_to_zshrc 'export PATH="/usr/local/bin:$PATH"' 1
 
-    export PATH="/usr/local/bin:$PATH"
-fi
+      export PATH="/usr/local/bin:$PATH"
+    )
+  fi
 
-if brew list | grep -Fq brew-cask; then
-  fancy_echo "Uninstalling old Homebrew-Cask ..."
-  brew uninstall --force brew-cask
-fi
+  HOMEBREW_PREFIX="$(brew --prefix)"
+  if [ -d "$HOMEBREW_PREFIX" ] && [ ! -r "$HOMEBREW_PREFIX" ]; then
+    fancy_echo "Ensure Homebrew directory ownership"
+    sudo chown -R "$LOGNAME:admin" /usr/local
+  fi
 
-fancy_echo "Updating Homebrew formulae ..."
-(
-	brew update --force # https://github.com/Homebrew/brew/issues/1151
-	brew bundle --file=- <<EOF
-cask_args appdir: "/Applications"
+  if [ ! -f "$HOMEBREW_PREFIX/Homebrew/.brew-cask-uninstalled" ] \
+    && brew tap | grep -Fq brew-cask; then
 
-tap "thoughtbot/formulae"
-tap "homebrew/services"
-tap "homebrew/cask-versions"
-tap "caskroom/cask"
-tap "homebrew/cask-fonts"
+    fancy_echo "Uninstalling old Homebrew-Cask ..."
+    brew uninstall --force brew-cask
+  fi
 
+  # Calling brew tap becomes terribly slow with many taps.
+  # Thus we short-circuit the detection with flag file
+  touch "$HOMEBREW_PREFIX/Homebrew/.brew-cask-uninstalled"
+}
 
-# Unix
-brew "git"
-brew "git-lfs"
-brew "openssl"
-brew "reattach-to-user-namespace"
-brew "tmux"
-brew "vim"
-brew "zsh"
-brew "tree"
-brew "lsd"
+brew_bootstrap
 
-
-# Tools
-brew "ffmpeg"
-brew "youtube-dl"
-brew "pandoc"
-brew "gnupg"
-brew "mas"
-brew "rsync"
-brew "pv"
-brew "tldr"
-brew "wget"
-brew "htop"
-brew "cjbassi/gotop/gotop"
-brew "watch"
-brew "npm"
-brew "pyenv"
-brew "duti"
-
-brew "httpie"
-brew "jq"
-
-# Cloud Native
-brew "kubernetes-cli"
-brew "kubernetes-helm"
-brew "stern"
-
-
-# Docker
-cask "docker"
-brew "docker-compose"
-
-# Random applications
-cask "iterm2"
-cask "1password"
-cask "1password-cli"
-cask "alfred"
-cask "appcleaner"
-cask "coconutbattery"
-cask "db-browser-for-sqlite"
-cask "fantastical"
-cask "firefox"
-cask "forklift"
-cask "google-chrome"
-cask "istat-menus"
-cask "sequel-pro"
-cask "skim"
-cask "skitch"
-cask "spotify"
-cask "visual-studio-code"
-cask "superduper"
-cask "telegram-desktop"
-cask "tripmode"
-cask "keepingyouawake"
-cask "vlc"
-
-# Quick Look Plugins
-cask "qlcolorcode"
-cask "qlstephen"
-cask "qlmarkdown"
-cask "quicklook-json"
-cask "webpquicklook"
-cask "suspicious-package"
-cask "quicklookase"
-cask "qlvideo"
-
-# Programming language prerequisites and package managers
-brew "libyaml" # should come after openssl
-brew "readline"
-brew "xz"
-brew "ansible"
-brew "packer"
-brew "gettext"
-
-# Fonts
-cask "font-inconsolata-nerd-font"
-cask "font-inconsolata"
-EOF
+fancy_echo "Installing Homebrew formulae ..."
+enter_cont && (
+  brew update --force # https://github.com/Homebrew/brew/issues/1151
+  brew bundle --file="${HERE}/Brewfile"
 ) || true
-
 
 fancy_echo "Installing apps from MAS..."
-mas account > /dev/null || (
-	read -p "Please log in to the Mac App Store, and press Enter to continue."
-)
+enter_cont && (
+  mas account > /dev/null || (
+    read -r -p "Please log in to the Mac App Store, and press Enter to continue."
+  )
 
-(
-brew bundle --file=- <<EOF
-
-# Apps from the App Store
-mas "DaisyDisk", id: 411643860
-mas "Magnet", id: 441258766
-mas "Numbers", id: 409203825
-mas "Pages", id: 409201541
-mas "Slack", id: 803453959
-mas "Things 3", id: 904280696
-EOF
+  brew bundle --file="${HERE}/Brewfile.mas"
 ) || true
 
-
 fancy_echo "Installing system-wide node packages..."
-(
-	npm_install_or_update "gtop"
+enter_cont && (
+  npm_install_or_update "gtop"
 ) || true
 
 fancy_echo "Customizing macOS system settings..."
+enter_cont && (
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
@@ -334,19 +246,19 @@ defaults write com.apple.finder _FXSortFoldersFirst -bool true
 
 # Wrap finder settings separately as they tend to fail on newly setup Macs
 (
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom false" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
-	/usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:showItemInfo true" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set DesktopViewSettings:IconViewSettings:labelOnBottom false" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:arrangeBy grid" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:gridSpacing 100" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :DesktopViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :FK_StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
+  /usr/libexec/PlistBuddy -c "Set :StandardViewSettings:IconViewSettings:iconSize 80" ~/Library/Preferences/com.apple.finder.plist
 ) || true
 
 chflags nohidden ~/Library
@@ -471,4 +383,6 @@ fancy_echo "Customizing Bartender application settings..."
 defaults write com.surteesstudios.Bartender hotkey -dict-add "characters" -string "E"
 defaults write com.surteesstudios.Bartender hotkey -dict-add "keyCode" -int 14
 defaults write com.surteesstudios.Bartender hotkey -dict-add "modifierFlags" -int 1179648
+) || true
 
+fancy_echo "Done."
