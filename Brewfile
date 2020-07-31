@@ -20,28 +20,37 @@ brew "lsd"
 
 
 # Tools
+brew "imagemagick"
 brew "ffmpeg"
+brew "flac"
+brew "opus"
 brew "youtube-dl"
 brew "pandoc"
 brew "gnupg"
 brew "mas"
 brew "rsync"
+brew "restic"
 brew "pv"
 brew "tldr"
 brew "wget"
+brew "curl"
 brew "htop"
 brew "watch"
 brew "npm"
 brew "pyenv"
 brew "duti"
-
+brew "pre-commit"
+brew "black"
+brew "pipx"
 brew "httpie"
 brew "jq"
 
 # Cloud Native
 brew "kubernetes-cli"
-brew "kubernetes-helm"
+brew "helm"
 brew "stern"
+brew "kubectx"
+brew "k9s"
 
 # Docker
 cask "docker"
