@@ -152,6 +152,10 @@ enter_cont && (
 
 fancy_echo "Installing apps from MAS..."
 enter_cont && (
+  if ! command -v mas >/dev/null; then
+    fancy_echo "Installing MAS CLI client"
+    brew install mas
+  fi
   mas account > /dev/null || (
     read -r -p "Please log in to the Mac App Store, and press Enter to continue."
   )
