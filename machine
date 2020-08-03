@@ -22,11 +22,15 @@ enter_cont() {
     return 0
   fi
 
-  read -r -p "${bold}Continue? [Y/n] ${reset}" input
+  read -r -p "${bold}Continue? [Y/n/q] ${reset}" input
 
   case $input in
       [nN][oO]|[nN])
       return 1
+      ;;
+      [qQ][uU][iI][tT]|[qQ])
+      fancy_echo "Bailing early."
+      exit 0
       ;;
       *)
       return 0
