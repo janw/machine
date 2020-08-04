@@ -78,6 +78,7 @@ cask "gpg-suite-no-mail"
 cask "tor-browser"
 cask "musicbrainz-picard"
 cask "plexamp"
+cask "sensiblesidebuttons"
 
 # Quick Look Plugins
 cask "qlcolorcode"
