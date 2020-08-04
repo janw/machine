@@ -37,14 +37,17 @@ brew "curl"
 brew "htop"
 brew "watch"
 brew "npm"
-brew "pyenv"
 brew "duti"
-brew "pre-commit"
-brew "black"
-brew "pipx"
 brew "httpie"
 brew "jq"
 brew "shellcheck"
+
+# Python dev
+brew "pyenv"
+brew "pre-commit"
+brew "black"
+brew "flake8"
+brew "pipx"
 
 # Cloud Native
 brew "kubernetes-cli"
