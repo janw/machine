@@ -44,6 +44,7 @@ brew "black"
 brew "pipx"
 brew "httpie"
 brew "jq"
+brew "shellcheck"
 
 # Cloud Native
 brew "kubernetes-cli"
