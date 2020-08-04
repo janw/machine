@@ -144,10 +144,15 @@ brew_bootstrap() {
 
 brew_bootstrap
 
-fancy_echo "Installing Homebrew formulae ..."
+fancy_echo "Installing Homebrew formulae..."
 enter_cont && (
   brew update --force # https://github.com/Homebrew/brew/issues/1151
   brew bundle --file="${HERE}/Brewfile"
+
+  if [ -f "${HERE}/Brewfile.local" ]; then
+    fancy_echo "Installing additional formulae from .local"
+    brew bundle --file="${HERE}/Brewfile.local"
+  fi
 ) || true
 
 fancy_echo "Installing apps from MAS..."
@@ -161,6 +166,10 @@ enter_cont && (
   )
 
   brew bundle --file="${HERE}/Brewfile.mas"
+  if [ -f "${HERE}/Brewfile.mas.local" ]; then
+    fancy_echo "Installing additional apps from .local"
+    brew bundle --file="${HERE}/Brewfile.mas.local"
+  fi
 ) || true
 
 fancy_echo "Installing system-wide node packages..."
