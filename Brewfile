@@ -41,6 +41,7 @@ brew "duti"
 brew "httpie"
 brew "jq"
 brew "shellcheck"
+brew "macos-trash"
 
 # Python dev
 brew "pyenv"
