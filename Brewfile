@@ -93,7 +93,6 @@ cask "quicklook-json"
 cask "webpquicklook"
 cask "suspicious-package"
 cask "quicklookase"
-cask "qlvideo"
 
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
