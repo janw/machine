@@ -154,6 +154,10 @@ enter_cont && (
     fancy_echo "Installing additional formulae from .local"
     brew bundle --file="${HERE}/Brewfile.local"
   fi
+  if [ -f "${HOME}/.Brewfile.local" ]; then
+    fancy_echo "Installing additional formulae from .local in home directory"
+    brew bundle --file="${HOME}/.Brewfile.local"
+  fi
 ) || true
 
 fancy_echo "Installing apps from MAS..."
@@ -171,6 +175,10 @@ enter_cont && (
   if [ -f "${HERE}/Brewfile.mas.local" ]; then
     fancy_echo "Installing additional apps from .local"
     brew bundle --file="${HERE}/Brewfile.mas.local"
+  fi
+  if [ -f "${HOME}/.Brewfile.mas.local" ]; then
+    fancy_echo "Installing additional apps from .local in home directory"
+    brew bundle --file="${HOME}/.Brewfile.mas.local"
   fi
 ) || true
 
