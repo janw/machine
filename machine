@@ -145,6 +145,7 @@ brew_bootstrap() {
 brew_bootstrap
 
 fancy_echo "Installing Homebrew formulae..."
+# shellcheck disable=SC2015
 enter_cont && (
   brew update --force # https://github.com/Homebrew/brew/issues/1151
   brew bundle --file="${HERE}/Brewfile"
@@ -156,6 +157,7 @@ enter_cont && (
 ) || true
 
 fancy_echo "Installing apps from MAS..."
+# shellcheck disable=SC2015
 enter_cont && (
   if ! command -v mas >/dev/null; then
     fancy_echo "Installing MAS CLI client"
@@ -173,11 +175,13 @@ enter_cont && (
 ) || true
 
 fancy_echo "Installing system-wide node packages..."
+# shellcheck disable=SC2015
 enter_cont && (
   npm_install_or_update "gtop"
 ) || true
 
 fancy_echo "Customizing macOS system settings..."
+# shellcheck disable=SC2015
 enter_cont && (
 sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
