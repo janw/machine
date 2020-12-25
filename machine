@@ -312,8 +312,8 @@ defaults write com.apple.dock show-process-indicators -bool true
 defaults write com.apple.dashboard mcx-disabled -bool true
 defaults write com.apple.dock dashboard-in-overlay -bool true
 
-defaults write com.apple.dock autohide-delay -float 0
-defaults write com.apple.dock autohide-time-modifier -float 0
+defaults write com.apple.dock autohide-delay -float 0.0001
+defaults write com.apple.dock autohide-time-modifier -float 0.1
 defaults write com.apple.dock autohide -bool true
 
 defaults write com.apple.dock showLaunchpadGestureEnabled -int 0
