@@ -1,0 +1,30 @@
+brew "ffmpeg"
+brew "flac"
+brew "opus"
+brew "youtube-dl"
+brew "restic"
+
+
+cask "coconutbattery"
+cask "skim"
+cask "skitch"
+cask "telegram"
+cask "vlc"
+cask "tor-browser"
+cask "musicbrainz-picard"
+
+# Quick Look Plugins
+cask "qlmarkdown"
+cask "quicklook-json"
+cask "suspicious-package"
+cask "qlcolorcode"
+cask "qlstephen"
+cask "webpquicklook"
+cask "quicklookase"
+
+cask "sequel-pro"
+cask "postico"
+cask "spotify"
+cask "plexamp"
+
+brew "ansible"

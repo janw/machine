@@ -5,7 +5,7 @@ tap "homebrew/services"
 tap "homebrew/cask-versions"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
-
+tap "homebrew/autoupdate"
 
 # Unix
 brew "git"
@@ -21,15 +21,10 @@ brew "lsd"
 
 # Tools
 brew "imagemagick"
-brew "ffmpeg"
-brew "flac"
-brew "opus"
-brew "youtube-dl"
 brew "pandoc"
 brew "gnupg"
 brew "mas"
 brew "rsync"
-brew "restic"
 brew "pv"
 brew "tldr"
 brew "wget"
@@ -45,10 +40,12 @@ brew "macos-trash"
 
 # Python dev
 brew "pyenv"
+brew "pyenv-virtualenv"
 brew "pre-commit"
 brew "black"
 brew "flake8"
 brew "pipx"
+brew "mypy"
 
 # Cloud Native
 brew "kubernetes-cli"
@@ -66,39 +63,18 @@ cask "iterm2"
 cask "1password"
 cask "alfred"
 cask "appcleaner"
-cask "coconutbattery"
 cask "db-browser-for-sqlite"
 cask "firefox"
 cask "google-chrome"
-cask "sequel-pro"
-cask "postico"
-cask "skim"
-cask "skitch"
-cask "spotify"
 cask "visual-studio-code"
-cask "telegram"
-cask "vlc"
 cask "gpg-suite-no-mail"
-cask "tor-browser"
-cask "musicbrainz-picard"
-cask "plexamp"
-cask "sensiblesidebuttons"
+cask "rectangle"
 
-# Quick Look Plugins
-cask "qlcolorcode"
-cask "qlstephen"
-cask "qlmarkdown"
-cask "quicklook-json"
-cask "webpquicklook"
-cask "suspicious-package"
-cask "quicklookase"
 
 # Programming language prerequisites and package managers
 brew "libyaml" # should come after openssl
 brew "readline"
 brew "xz"
-brew "ansible"
-brew "packer"
 brew "gettext"
 
 # Fonts
