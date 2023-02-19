@@ -1,6 +1,5 @@
 cask_args appdir: "/Applications"
 
-tap "thoughtbot/formulae"
 tap "homebrew/services"
 tap "homebrew/cask-versions"
 tap "homebrew/cask"
@@ -18,15 +17,18 @@ brew "zsh"
 brew "tree"
 brew "lsd"
 
+# Databases + tools
+cask "postgres-unofficial"
+cask "postico"
+brew "redis"
+
 
 # Tools
 brew "imagemagick"
 brew "pandoc"
-brew "gnupg"
 brew "mas"
 brew "rsync"
 brew "pv"
-brew "tldr"
 brew "wget"
 brew "curl"
 brew "htop"
@@ -36,7 +38,7 @@ brew "duti"
 brew "httpie"
 brew "jq"
 brew "shellcheck"
-brew "macos-trash"
+cask "slack"
 
 # Python dev
 brew "pyenv"
@@ -47,7 +49,7 @@ brew "flake8"
 brew "pipx"
 brew "mypy"
 
-# Cloud Native
+# Kubernetes
 brew "kubernetes-cli"
 brew "helm"
 brew "stern"
@@ -56,7 +58,6 @@ brew "k9s"
 
 # Docker
 cask "docker"
-brew "docker-compose"
 
 # Random applications
 cask "iterm2"
@@ -69,16 +70,18 @@ cask "google-chrome"
 cask "visual-studio-code"
 cask "gpg-suite-no-mail"
 cask "rectangle"
-
+cask "maccy"
+cask "vlc"
+cask "istat-menus"
 
 # Programming language prerequisites and package managers
+brew "openssl"
 brew "libyaml" # should come after openssl
 brew "readline"
 brew "xz"
 brew "gettext"
 
 # Fonts
-cask "font-inconsolata-nerd-font"
-cask "font-inconsolata"
 cask "font-ibm-plex"
+cask "font-inconsolata-nerd-font"
 cask "font-fantasque-sans-mono-nerd-font"
