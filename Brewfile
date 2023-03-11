@@ -57,7 +57,10 @@ brew "kubectx"
 brew "k9s"
 
 # Docker
-cask "docker"
+brew "docker"
+brew "docker-buildx"
+brew "docker-compose"
+brew "colima"
 
 # Random applications
 cask "iterm2"
