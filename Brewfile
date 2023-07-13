@@ -55,7 +55,8 @@ brew "kubectx"
 brew "k9s"
 
 # Docker
-cask "docker"
+brew "colima"
+brew "docker"
 brew "docker-compose"
 
 # Random applications
